@@ -1,8 +1,11 @@
 import os
 from typing import Optional, List, Literal
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
-from fastapi import FastAPI, Body, HTTPException, status
+import jwt
+from jwt.exceptions import InvalidTokenError
+
+from fastapi import FastAPI, Body, HTTPException, status ,Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -43,6 +46,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = "1f0464bcfbbb8ddbe2b6abafdfce6e6a5d7a47a2e0cbe3a1b0ccd2d1c2d883c0"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 
@@ -163,9 +168,27 @@ class CustomerModel(BaseModel):
     )
 
 
-class CustomerCreate(CustomerModel):
+class CustomerCreateModel(CustomerModel):
     hashed_password: str = Field(...)
-
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_schema_extra={
+            "example": {
+                "customerId": "123456",
+                "name": "John Doe",
+                "phoneNumber": "+1234567890",
+                "email": "john.doe@example.com",
+                "hashed_password": "hashed_password",
+                "preferredPackages": [
+                    {"packageId": "603e71a7a6e6e5a1b7a1f1e1", "customizedOptions": {"minutes": 800, "sms": 500, "data": 7}}
+                ],
+                "selectedDeals": [
+                    {"dealId": "603e71a7a6e6e5a1b7a1f1e3", "activationDate": "2024-02-01"}
+                ]
+            }
+        }
+    )
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -175,12 +198,54 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
 # Retrieve the user from MongoDB by username or other unique identifier
 async def get_user(customer_collection, username: str):
     customer_data = await customer_collection.find_one({"email": username})
     if customer_data is None:
         raise HTTPException(status_code=404, detail="Customer not found")
     return CustomerModel(**customer_data)
+
+def authenticate_user(customer_collection, username: str, password: str):
+    user = get_user(customer_collection, username)
+    if not user:
+        return False
+    if not verify_password(password, user.hashed_password):
+        return False
+    return user
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except InvalidTokenError:
+        raise credentials_exception
+    user = get_user(customer_collection, username=token_data.username)
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+async def get_current_active_user(
+    current_user: Annotated[CustomerModel, Depends(get_current_user)],
+):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
 
 ### FastAPI Endpoints
 @app.post("/packages/", response_model=PackageModel, status_code=status.HTTP_201_CREATED)
@@ -197,8 +262,8 @@ async def create_deal(deal: DealModel = Body(...)):
     return created_deal
 
 
-@app.post("/customers/", response_model=CustomerCreate, status_code=status.HTTP_201_CREATED)
-async def create_customer(customer: CustomerCreate = Body(...)):
+@app.post("/customers/", response_model=CustomerCreateModel, status_code=status.HTTP_201_CREATED)
+async def create_customer(customer: CustomerCreateModel = Body(...)):
     hashed_password = get_password_hash(customer.password)
     customer_data = customer.dict()
     customer_data["hashed_password"] = hashed_password
@@ -206,6 +271,9 @@ async def create_customer(customer: CustomerCreate = Body(...)):
     new_customer = await customer_collection.insert_one(customer.model_dump(by_alias=True, exclude=["id"]))
     created_customer = await customer_collection.find_one({"_id": new_customer.inserted_id})
     return created_customer
+
+
+
 
 
 @app.get("/packages/{id}", response_model=PackageModel)
@@ -250,3 +318,53 @@ async def delete_package(id: str):
     if delete_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Package not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@app.post("/token")
+async def login_for_access_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+) -> Token:
+    user = authenticate_user(customer_collection, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return Token(access_token=access_token, token_type="bearer")
+
+@app.post("/register", response_model=CustomerCreateModel, status_code=status.HTTP_201_CREATED)
+async def register(customer: CustomerCreateModel = Body(...)):
+    # Check if user already exists
+    if await customer_collection.find_one({"email": customer.email}):
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    # Hash password and prepare customer data
+    hashed_password = get_password_hash(customer.password)
+    customer_data = customer.dict()
+    customer_data["hashed_password"] = hashed_password
+    customer_data.pop("password")
+
+    # Insert into database
+    new_customer = await customer_collection.insert_one(customer_data)
+    created_customer = await customer_collection.find_one({"_id": new_customer.inserted_id})
+    return created_customer
+
+@app.post("/login", response_model=Token)
+async def login(email: str = Body(...), password: str = Body(...)):
+    # Retrieve user from the database
+    customer = await customer_collection.find_one({"email": email})
+    if not customer or not verify_password(password, customer["hashed_password"]):
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    # Create JWT token
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(data={"sub": str(customer["_id"])}, expires_delta=access_token_expires)
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/protected-route")
+async def protected_route(current_user: CustomerCreateModel = Depends(get_current_user)):
+    return {"message": f"Hello, {current_user['name']}. You have access to this protected route."}
