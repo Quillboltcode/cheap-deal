@@ -1,16 +1,18 @@
 import os
-from typing import Optional, List, Literal
+from typing import Optional, List, Literal, Dict
 from datetime import datetime, timedelta, timezone
 
 import jwt
 from jwt.exceptions import InvalidTokenError
 
-from fastapi import FastAPI, Body, HTTPException, status ,Depends
+from fastapi import FastAPI, Body, HTTPException, status ,Depends, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
-from pydantic import ConfigDict, BaseModel, Field, EmailStr
+from pydantic import ConfigDict, BaseModel, Field, EmailStr, PositiveFloat
+
+from pydantic_extra_types.payment import PaymentCardNumber
 from pydantic.functional_validators import BeforeValidator
 from typing_extensions import Annotated
 
@@ -57,6 +59,7 @@ db = client.get_database("cheap-deals")
 package_collection = db.get_collection("packages")
 deal_collection = db.get_collection("deals")
 customer_collection = db.get_collection("customers")
+order_collection = db.get_collection("orders")
 
 # Represents an ObjectId field in the database.
 PyObjectId = Annotated[str, BeforeValidator(str)]
@@ -180,15 +183,52 @@ class CustomerCreateModel(CustomerModel):
                 "phoneNumber": "+1234567890",
                 "email": "john.doe@example.com",
                 "hashed_password": "hashed_password",
-                "preferredPackages": [
-                    {"packageId": "603e71a7a6e6e5a1b7a1f1e1", "customizedOptions": {"minutes": 800, "sms": 500, "data": 7}}
-                ],
-                "selectedDeals": [
-                    {"dealId": "603e71a7a6e6e5a1b7a1f1e3", "activationDate": "2024-02-01"}
-                ]
             }
         }
     )
+
+class OrderModel(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    customerId: str = Field(...)
+    packages: List[Dict] = Field(...)  # List of package details
+    deals: List[Dict] = Field(...)  # List of deal details
+    totalAmount: PositiveFloat = Field(...)  # Total cost of the order
+    orderDate: datetime = Field(default_factory=datetime.now(timezone.utc))  # Timestamp of the order
+    creditCardNumber: str = Field(...)  # Credit card number (tokenized)
+    cardHolderName: str = Field(...)
+    expirationMonth: int = Field(..., ge=1, le=12)  # Month: 1-12
+    expirationYear: int = Field(..., ge=datetime.now(timezone.utc).year())  # Year >= current year
+    cvv: str = Field(...)  # 3 or 4 digit security code
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_schema_extra={
+            "example": {
+                "customerId": "123456",
+                "packages": [
+                    {
+                        "packageId": "603e71a7a6e6e5a1b7a1f1e1",
+                        "customizedOptions": {"minutes": 800, "sms": 500, "data": 7},
+                    }
+                ],
+                "deals": [
+                    {
+                        "dealId": "603e71a7a6e6e5a1b7a1f1e3",
+                        "activationDate": "2024-02-01",
+                    }
+                ],
+                "totalAmount": 299.99,
+                "creditCardNumber": "4242424242424242",
+                "cardHolderName": "John Doe",
+                "expirationMonth": 12,
+                "expirationYear": 2024,
+                "cvv": "123",
+                "orderDate": "2024-11-12T12:34:56.789Z",
+            }
+        },
+    )
+
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -265,14 +305,12 @@ async def create_deal(deal: DealModel = Body(...)):
 @app.post("/customers/", response_model=CustomerCreateModel, status_code=status.HTTP_201_CREATED)
 async def create_customer(customer: CustomerCreateModel = Body(...)):
     hashed_password = get_password_hash(customer.password)
-    customer_data = customer.dict()
+    customer_data = customer.model_dump()
     customer_data["hashed_password"] = hashed_password
     customer_data.pop("password")  
     new_customer = await customer_collection.insert_one(customer.model_dump(by_alias=True, exclude=["id"]))
     created_customer = await customer_collection.find_one({"_id": new_customer.inserted_id})
     return created_customer
-
-
 
 
 
@@ -337,24 +375,42 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")
 
 @app.post("/register", response_model=CustomerCreateModel, status_code=status.HTTP_201_CREATED)
-async def register(customer: CustomerCreateModel = Body(...)):
+async def register(
+    name: str = Form(...),
+    email: str = Form(...),
+    phoneNumber: str = Form(...),
+    password: str = Form(...),
+):
+    """
+    Register a new user using form data.
+    """
     # Check if user already exists
-    if await customer_collection.find_one({"email": customer.email}):
+    if await customer_collection.find_one({"email": email}):
         raise HTTPException(status_code=400, detail="Email already registered")
 
     # Hash password and prepare customer data
-    hashed_password = get_password_hash(customer.password)
-    customer_data = customer.dict()
-    customer_data["hashed_password"] = hashed_password
-    customer_data.pop("password")
+    hashed_password = get_password_hash(password)
+    customer_data = {
+        "name": name,
+        "email": email,
+        "phoneNumber": phoneNumber,
+        "hashed_password": hashed_password,
+    }
 
     # Insert into database
     new_customer = await customer_collection.insert_one(customer_data)
     created_customer = await customer_collection.find_one({"_id": new_customer.inserted_id})
     return created_customer
 
+
 @app.post("/login", response_model=Token)
-async def login(email: str = Body(...), password: str = Body(...)):
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    """
+    Log in a user using form data.
+    """
+    email = form_data.username  # `OAuth2PasswordRequestForm` uses `username` for the login field
+    password = form_data.password
+
     # Retrieve user from the database
     customer = await customer_collection.find_one({"email": email})
     if not customer or not verify_password(password, customer["hashed_password"]):
@@ -362,9 +418,66 @@ async def login(email: str = Body(...), password: str = Body(...)):
 
     # Create JWT token
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(data={"sub": str(customer["_id"])}, expires_delta=access_token_expires)
+    access_token = create_access_token(
+        data={"sub": str(customer["_id"])}, expires_delta=access_token_expires
+    )
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get("/protected-route")
 async def protected_route(current_user: CustomerCreateModel = Depends(get_current_user)):
     return {"message": f"Hello, {current_user['name']}. You have access to this protected route."}
+
+
+@app.get("/orders", response_model=List[OrderModel])
+async def get_orders(current_user: dict = Depends(get_current_user)):
+    """
+    Get all orders for the authenticated customer.
+    """
+    customer_id = current_user["_id"]
+    orders = await order_collection.find({"customerId": str(customer_id)}).to_list(100)
+    return orders
+
+@app.post("/orders", response_model=OrderModel, status_code=status.HTTP_201_CREATED)
+async def create_order(
+    packages: str = Form(...),  # JSON string representing the list of packages
+    deals: str = Form(...),  # JSON string representing the list of deals
+    totalAmount: float = Form(...),
+    creditCardNumber: str = Form(...),
+    cardHolderName: str = Form(...),
+    expirationMonth: int = Form(...),
+    expirationYear: int = Form(...),
+    cvv: str = Form(...),
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Create an order for the authenticated customer using form data.
+    """
+    customer_id = current_user["_id"]
+
+    # Validate the packages and deals are JSON strings and parse them
+    try:
+        import json
+
+        packages_data = json.loads(packages)
+        deals_data = json.loads(deals)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid packages or deals format")
+
+    # Save the order
+    order_data = {
+        "customerId": str(customer_id),
+        "packages": packages_data,
+        "deals": deals_data,
+        "totalAmount": totalAmount,
+        "creditCardNumber": PaymentCardNumber,  # Ideally, this should be tokenized securely
+        "cardHolderName": cardHolderName,
+        "expirationMonth": expirationMonth,
+        "expirationYear": expirationYear,
+        "cvv": cvv,
+        "orderDate": datetime.now(timezone.utc),
+    }
+
+    # Insert into MongoDB
+    new_order = await order_collection.insert_one(order_data)
+    created_order = await order_collection.find_one({"_id": new_order.inserted_id})
+    return created_order
