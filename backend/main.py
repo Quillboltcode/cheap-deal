@@ -413,7 +413,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     Log in a user using form data.
     """
-    email = form_data.username  # `OAuth2PasswordRequestForm` uses `username` for the login field
+    email = form_data.email  # `OAuth2PasswordRequestForm` uses `username` for the login field
     password = form_data.password
 
     # Retrieve user from the database
