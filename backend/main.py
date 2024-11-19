@@ -1,7 +1,7 @@
 import os
 from typing import Optional, List, Literal, Dict
 from datetime import datetime, timedelta, timezone
-
+import logging
 import jwt
 from jwt.exceptions import InvalidTokenError
 
@@ -20,6 +20,15 @@ from bson import ObjectId
 import motor.motor_asyncio
 from pymongo import ReturnDocument
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG, filename='runtime.log', filemode='w', format = (
+                                                    '%(levelname)s:\t'
+                                                    '%(filename)s:'
+                                                    '%(funcName)s():'
+                                                    '%(lineno)d\t'
+                                                    '%(message)s'
+                                                )
+                    )
 app = FastAPI(
     title="Package Deal API",
     summary="An API for managing packages, deals, and customer preferences in MongoDB."
@@ -84,7 +93,7 @@ class PackageModel(BaseModel):
     category: Literal["Mobile", "Broadband", "Tablet"] = Field(...)
     products: List[ProductModel] = Field(...)
     services: List[ServiceModel] = Field(...)
-    image : Optional[bytes] = Field(None, description="image data in bitmap format or gridfs")
+    image : Optional[bytes] = Field(None, description="image data in bitmap format or gridfs or urls")
     customOptions: Optional[dict] = Field(None)  # For customization limits
     model_config = ConfigDict(
         populate_by_name=True,
@@ -140,52 +149,37 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: str | None = None
 
+
+
 ### Customer Model
 class CustomerModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    customerId: str = Field(...)
     name: str = Field(...)
+    dateOfBirth: datetime = Field(...)
+    address: str = Field(...)
+    gender: str = Field(...)
     phoneNumber: str = Field(...)
     email: EmailStr = Field(...)
-    hashed_password: str = Field(...)  # New field to store the hashed password
-    preferredPackages: List[dict] = Field(...)  # Contains customized packages
-    selectedDeals: List[dict] = Field(...)  # Contains deals chosen by the customer
+    hashed_password: str = Field(...)  # Contains deals chosen by the customer
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,
         json_schema_extra={
             "example": {
-                "customerId": "123456",
+                
                 "name": "John Doe",
-                "phoneNumber": "+1234567890",
-                "email": "john.doe@example.com",
-            
-                "preferredPackages": [
-                    {"packageId": "603e71a7a6e6e5a1b7a1f1e1", "customizedOptions": {"minutes": 800, "sms": 500, "data": 7}}
-                ],
-                "selectedDeals": [
-                    {"dealId": "603e71a7a6e6e5a1b7a1f1e3", "activationDate": "2024-02-01"}
-                ]
-            }
-        }
-    )
-
-
-class CustomerCreateModel(CustomerModel):
-    hashed_password: str = Field(...)
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True,
-        json_schema_extra={
-            "example": {
-                "customerId": "123456",
-                "name": "John Doe",
+                "dateOfBirth": "1995-01-01",
+                "address": "123 Main St",
+                "gender": "Male",
                 "phoneNumber": "+1234567890",
                 "email": "john.doe@example.com",
                 "hashed_password": "hashed_password",
             }
         }
     )
+
+
+
 
 class OrderModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
@@ -197,7 +191,7 @@ class OrderModel(BaseModel):
     creditCardNumber: str = Field(...)  # Credit card number (tokenized)
     cardHolderName: str = Field(...)
     expirationMonth: int = Field(..., ge=1, le=12)  # Month: 1-12
-    # expirationYear: int = Field(..., ge=datetime.now(timezone.utc).year())  # Year >= current year
+    expirationYear: datetime = Field(..., default_factory=datetime.now)  # Year >= current year
     cvv: str = Field(...)  # 3 or 4 digit security code
 
     model_config = ConfigDict(
@@ -248,12 +242,14 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 # Retrieve the user from MongoDB by username or other unique identifier
 async def get_user(customer_collection, username: str):
     customer_data = await customer_collection.find_one({"email": username})
+    logger.debug(f"customer_data: {customer_data}")  # Log the customer_data dictionary at DEBUG level
+    
     if customer_data is None:
         raise HTTPException(status_code=404, detail="Customer not found")
     return CustomerModel(**customer_data)
 
-def authenticate_user(customer_collection, username: str, password: str):
-    user = get_user(customer_collection, username)
+async def authenticate_user(customer_collection, username: str, password: str):
+    user = await get_user(customer_collection, username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -302,8 +298,8 @@ async def create_deal(deal: DealModel = Body(...)):
     return created_deal
 
 
-@app.post("/customers/", response_model=CustomerCreateModel, status_code=status.HTTP_201_CREATED)
-async def create_customer(customer: CustomerCreateModel = Body(...)):
+@app.post("/customers/", response_model=CustomerModel, status_code=status.HTTP_201_CREATED)
+async def create_customer(customer: CustomerModel = Body(...)):
     hashed_password = get_password_hash(customer.password)
     customer_data = customer.model_dump()
     customer_data["hashed_password"] = hashed_password
@@ -312,6 +308,11 @@ async def create_customer(customer: CustomerCreateModel = Body(...)):
     created_customer = await customer_collection.find_one({"_id": new_customer.inserted_id})
     return created_customer
 
+# Get all packages
+@app.get("/packages/", response_model=List[PackageModel])
+async def get_packages():
+    packages = await package_collection.find().to_list(length=None)
+    return packages
 
 
 @app.get("/packages/{id}", response_model=PackageModel)
@@ -357,11 +358,11 @@ async def delete_package(id: str):
         raise HTTPException(status_code=404, detail="Package not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@app.post("/token")
+@app.post("/token",response_model_exclude_unset=True)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
-    user = authenticate_user(customer_collection, form_data.username, form_data.password)
+    user = await authenticate_user(customer_collection, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -374,11 +375,14 @@ async def login_for_access_token(
     )
     return Token(access_token=access_token, token_type="bearer")
 
-@app.post("/register", response_model=CustomerCreateModel, status_code=status.HTTP_201_CREATED)
+@app.post("/register", response_model=CustomerModel, status_code=status.HTTP_201_CREATED,response_model_exclude_unset=True)
 async def register(
     name: str = Form(...),
-    email: str = Form(...),
+    dateOfBirth: str = Form(...),
+    address: str = Form(...),
+    gender: str = Form(...),
     phoneNumber: str = Form(...),
+    email: str = Form(...),
     password: str = Form(...),
 ):
     """
@@ -392,6 +396,9 @@ async def register(
     hashed_password = get_password_hash(password)
     customer_data = {
         "name": name,
+        "dateOfBirth": datetime.strptime(dateOfBirth, '%d-%m-%Y'),
+        "address": address,
+        "gender": gender,
         "email": email,
         "phoneNumber": phoneNumber,
         "hashed_password": hashed_password,
@@ -424,7 +431,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get("/protected-route")
-async def protected_route(current_user: CustomerCreateModel = Depends(get_current_user)):
+async def protected_route(current_user: CustomerModel = Depends(get_current_user)):
     return {"message": f"Hello, {current_user['name']}. You have access to this protected route."}
 
 
@@ -469,7 +476,7 @@ async def create_order(
         "packages": packages_data,
         "deals": deals_data,
         "totalAmount": totalAmount,
-        "creditCardNumber": PaymentCardNumber,  # Ideally, this should be tokenized securely
+        "creditCardNumber": creditCardNumber,  # Ideally, this should be tokenized securely
         "cardHolderName": cardHolderName,
         "expirationMonth": expirationMonth,
         "expirationYear": expirationYear,
