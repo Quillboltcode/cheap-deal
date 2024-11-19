@@ -101,9 +101,9 @@ class PackageModel(BaseModel):
         json_schema_extra={
             "example": {
                 "packageName": "MobileOnly",
-                "type": "default",
+                "type" "default",
                 "category": "Mobile",
-                "products": [{"device": "Mobile", "model": "Model X", "brand": "Brand A"}],
+                "products":: [{"device": "Mobile", "model": "Model X", "brand": "Brand A"}],
                 "services": [
                     {"name": "minutes", "limit": 500},
                     {"name": "sms", "limit": 1000},
