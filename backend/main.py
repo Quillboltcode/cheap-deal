@@ -101,9 +101,9 @@ class PackageModel(BaseModel):
         json_schema_extra={
             "example": {
                 "packageName": "MobileOnly",
-                "type" "default",
+                "type" :"default",
                 "category": "Mobile",
-                "products":: [{"device": "Mobile", "model": "Model X", "brand": "Brand A"}],
+                "products": [{"device": "Mobile", "model": "Model X", "brand": "Brand A"}],
                 "services": [
                     {"name": "minutes", "limit": 500},
                     {"name": "sms", "limit": 1000},
@@ -167,7 +167,7 @@ class CustomerModel(BaseModel):
         json_schema_extra={
             "example": {
                 "name": "John Doe",
-                "dateOfBirth": "1995-01-01",
+                "dateOfBirth": "01/30/2000",
                 "address": "123 Main St",
                 "gender": "Male",
                 "phoneNumber": "+1234567890",
@@ -394,7 +394,7 @@ async def register(
     hashed_password = get_password_hash(password)
     customer_data = {
         "name": name,
-        "dateOfBirth": datetime.strptime(dateOfBirth, '%d-%m-%Y'),
+        "dateOfBirth": datetime.strptime(dateOfBirth, '%m/%d/%Y'),
         "address": address,
         "gender": gender,
         "email": email,
