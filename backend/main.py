@@ -92,9 +92,9 @@ class PackageModel(BaseModel):
         json_schema_extra={
             "example": {
                 "packageName": "MobileOnly",
-                "type": "default",
+                "type" "default",
                 "category": "Mobile",
-                "products": [{"device": "Mobile", "model": "Model X", "brand": "Brand A"}],
+                "products":: [{"device": "Mobile", "model": "Model X", "brand": "Brand A"}],
                 "services": [
                     {"name": "minutes", "limit": 500},
                     {"name": "sms", "limit": 1000},
@@ -193,11 +193,11 @@ class OrderModel(BaseModel):
     packages: List[Dict] = Field(...)  # List of package details
     deals: List[Dict] = Field(...)  # List of deal details
     totalAmount: PositiveFloat = Field(...)  # Total cost of the order
-    orderDate: datetime = Field(default_factory=datetime.now(timezone.utc))  # Timestamp of the order
+    orderDate: datetime = Field(default_factory=datetime.now)  # Timestamp of the order
     creditCardNumber: str = Field(...)  # Credit card number (tokenized)
     cardHolderName: str = Field(...)
     expirationMonth: int = Field(..., ge=1, le=12)  # Month: 1-12
-    expirationYear: int = Field(..., ge=datetime.now(timezone.utc).year())  # Year >= current year
+    # expirationYear: int = Field(..., ge=datetime.now(timezone.utc).year())  # Year >= current year
     cvv: str = Field(...)  # 3 or 4 digit security code
 
     model_config = ConfigDict(
