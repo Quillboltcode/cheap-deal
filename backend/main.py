@@ -166,7 +166,6 @@ class CustomerModel(BaseModel):
         arbitrary_types_allowed=True,
         json_schema_extra={
             "example": {
-                
                 "name": "John Doe",
                 "dateOfBirth": "1995-01-01",
                 "address": "123 Main St",
@@ -241,11 +240,10 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 # Retrieve the user from MongoDB by username or other unique identifier
 async def get_user(customer_collection, username: str):
-    customer_data = await customer_collection.find_one({"email": username})
-    logger.debug(f"customer_data: {customer_data}")  # Log the customer_data dictionary at DEBUG level
-    
+    customer_data = await customer_collection.find_one({"email": username}) # Log the customer_data dictionary at DEBUG level
     if customer_data is None:
         raise HTTPException(status_code=404, detail="Customer not found")
+    CustomerModel.id = customer_data
     return CustomerModel(**customer_data)
 
 async def authenticate_user(customer_collection, username: str, password: str):
@@ -371,7 +369,7 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.name}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
 
