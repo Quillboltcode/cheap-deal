@@ -23,43 +23,43 @@ const Register = () => {
 
                 <div className='mt-6 text-3xl items-start relative'>
                     <p>Name</p>
-                    <input type="text" className='w-[90%] border mt-2 rounded-md h-14 pl-8 pr-2' />
+                    <input type="text" className='w-[100%] border border-gray-300 mt-2 rounded-md h-14 pl-8 pr-2' />
                     <MdOutlineDriveFileRenameOutline className='absolute text-lg bottom-4 left-1.5' />
                 </div>
 
                 <div className='mt-6 text-3xl items-start relative'>
                     <p>Date of birth</p>
-                    <input type="date" className='w-[90%] border mt-2 rounded-md h-14 pl-8 pr-2' />
+                    <input type="date" className='w-[100%] border border-gray-300 mt-2 rounded-md h-14 pl-8 pr-2' />
                     <CiCalendarDate className='absolute text-lg bottom-4 left-1.5' />
                 </div>
 
                 <div className='mt-6 text-3xl items-start relative'>
                     <p>Address</p>
-                    <input type="type" className='w-[90%] border mt-2 rounded-md h-14 pl-8 pr-2' />
+                    <input type="type" className='w-[100%] border border-gray-300 mt-2 rounded-md h-14 pl-8 pr-2' />
                     <CiLocationOn className='absolute text-lg bottom-4 left-1.5' />
                 </div>
 
                 <div className='mt-6 text-3xl items-start relative'>
                     <p>Gender</p>
-                    <input type="type" className='w-[90%] border mt-2 rounded-md h-14 pl-8 pr-2' />
+                    <input type="type" className='w-[100%] border border-gray-300 mt-2 rounded-md h-14 pl-8 pr-2' />
                     <AiOutlineEllipsis className='absolute text-lg bottom-4 left-1.5' />
                 </div>
 
                 <div className='mt-6 text-3xl items-start relative'>
                     <p >Phone</p>
-                    <input type="text" className='w-[90%] border mt-2 rounded-md h-14 pl-8 pr-2' />
+                    <input type="number" className='w-[100%] border border-gray-300 mt-2 rounded-md h-14 pl-8 pr-2' />
                     <MdOutlineLocalPhone className='absolute text-lg bottom-4 left-1.5' />
                 </div>
 
                 <div className='mt-6 text-3xl items-start relative'>
                     <p >Email</p>
-                    <input type="text" className='w-[90%] border mt-2 rounded-md h-14 pl-8 pr-2' />
+                    <input type="text" className='w-[100%] border border-gray-300 mt-2 rounded-md h-14 pl-8 pr-2' />
                     <HiOutlineMail className='absolute text-lg bottom-4 left-1.5' />
                 </div>
 
                 <div className='mt-6 text-3xl items-start relative'>
                     <p >Password</p>
-                    <input type={`${isShow ? 'text' : 'password'}`} className='w-[90%] border mt-2 rounded-md h-14 pl-8 pr-12' />
+                    <input type={`${isShow ? 'text' : 'password'}`} className='w-[100%] border border-gray-300 mt-2 rounded-md h-14 pl-8 pr-12' />
                     <RiLockPasswordLine className='absolute text-lg bottom-4 left-1.5' />
                     {
                         isShow ?
@@ -69,7 +69,7 @@ const Register = () => {
                 </div>
 
                 <div className='flex justify-center'>
-                    <button className='mb-3 text-2xl mt-10 w-[70%] border rounded-md h-14 bg-blue-400 hover:bg-blue-500'>Register</button>
+                    <button className='mb-3 text-2xl mt-10 w-[70%] border border-gray-300 rounded-md h-14 bg-blue-400 hover:bg-blue-500'>Register</button>
                 </div>
             </form>
 

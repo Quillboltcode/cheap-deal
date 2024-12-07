@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { HiOutlineMail } from "react-icons/hi";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { FaRegEye } from "react-icons/fa6";
@@ -8,47 +8,44 @@ import fb_icon from '../assets/facebook_icon.png'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios'
+import { AppContext } from '../context/AppContext';
 
 const login = () => {
+
+    const { user, setUser } = useContext(AppContext)
 
     const [isShow, setIsShow] = useState(false)
     const [email, setEmail] = useState()
     const [password, setPassword] = useState()
 
-    const Login = async () => {
-        try {
-            const {data} = await axios.post('http://localhost:8080/login')
-
-        
-            
-        } catch (error) {
-            toast.error(error.message)
-        }
-    }
-
     const navigate = useNavigate()
+
+    const login = (e) => {
+        e.preventDefault()
+
+    }
 
     return (
         <div className='flex flex-col items-center justify-center px-3 py-10 '>
-            <form >
+            <form onSubmit={login}>
                 <p className='text-4xl font-bold text-center'>LOGIN</p>
 
                 <div className='mt-6 text-3xl items-start relative'>
                     <p >Email</p>
                     <input
                         type="text"
-                        className='w-[90%] border mt-2 rounded-md h-14 pl-8 pr-2' 
+                        className='w-[100%] border border-gray-300 mt-2 rounded-md h-14 pl-8 pr-2'
                         value={email} onChange={(e) => setEmail(e.target.value)}
-                        />
+                    />
                     <HiOutlineMail className='absolute text-lg bottom-4 left-1.5' />
                 </div>
 
                 <div className='mt-6 text-3xl items-start relative'>
                     <p >Password</p>
-                    <input 
-                    type={`${isShow ? 'text' : 'password'}`} 
-                    className='w-[90%] border mt-2 rounded-md h-14 pl-8 pr-12' 
-                    value={password} onChange={(e) => setPassword(e.target.value)}
+                    <input
+                        type={`${isShow ? 'text' : 'password'}`}
+                        className='w-[100%] border border-gray-300 mt-2 rounded-md h-14 pl-8 pr-12'
+                        value={password} onChange={(e) => setPassword(e.target.value)}
                     />
                     <RiLockPasswordLine className='absolute text-lg bottom-4 left-1.5' />
                     {
