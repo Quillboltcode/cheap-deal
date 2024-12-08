@@ -12,7 +12,7 @@ import { AppContext } from '../context/AppContext';
 
 const login = () => {
 
-    const { user, setUser } = useContext(AppContext)
+    const { UrlBackend, setProfile } = useContext(AppContext)
 
     const [isShow, setIsShow] = useState(false)
     const [email, setEmail] = useState()
@@ -20,9 +20,25 @@ const login = () => {
 
     const navigate = useNavigate()
 
-    const login = (e) => {
+    const login = async (e) => {
         e.preventDefault()
 
+        if (!email || !password) {
+            toast.error("Missing Field")
+            return
+        }
+
+        try {
+            const { data } = await axios.post(UrlBackend + '/api/login', { email, password })
+
+            if (data.success) {
+                toast.success("Login Successfull")
+                navigate('/dashboard')
+                await setProfile(data.isUser)
+            }
+        } catch (e) {
+            toast.error(e.response.data.message)
+        }
     }
 
     return (
