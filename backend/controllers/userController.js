@@ -1,6 +1,7 @@
 import validator from 'validator'
 import userModel from '../models/userModel.js'
 import { v2 as cloudinary } from 'cloudinary'
+import submitModel from '../models/submitModel.js'
 
 // api register
 const userRegister = async (req, res) => {
@@ -137,4 +138,67 @@ const editProfile = async (req, res) => {
 }
 
 
-export { userRegister, login, getProfile, editProfile }
+// api add submit 
+const addSubmit = async (req, res) => {
+    try {
+        const { type, text } = req.body;
+        const image = req.file; // Assuming file is uploaded as `file` field
+
+        // Validate required fields
+        if (!type || !text) {
+            return res.status(400).json({ success: false, message: "Type and text are required." });
+        }
+
+        let imageUrl = null;
+
+        // Handle image upload if provided
+        if (image) {
+            const uploadResult = await cloudinary.uploader.upload(image.path, { resource_type: 'image' });
+            imageUrl = uploadResult.secure_url;
+        }
+
+        // Create a new submission
+        const newSubmit = new submitModel({ type, text, image: imageUrl });
+
+        // Save the submission to the database
+        await newSubmit.save();
+
+        res.status(201).json({ success: true, message: "Submission created successfully.", data: newSubmit });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const getSubmit = async (req, res) => {
+    try {
+        const { id } = req.body;
+
+        let submissions;
+
+        // Check if an ID is provided
+        if (id) {
+            submissions = await submitModel.findById(id);
+
+            if (!submissions) {
+                return res.status(404).json({ success: false, message: "Submission not found." });
+            }
+        } else {
+            // If no ID is provided, fetch all submissions
+            submissions = await submitModel.find();
+
+            if (!submissions || submissions.length === 0) {
+                return res.status(404).json({ success: false, message: "No submissions found." });
+            }
+        }
+
+        // Return the submission(s)
+        res.status(200).json({ success: true, data: submissions });
+    } catch (error) {
+        // Handle unexpected errors
+        console.error(error);
+        res.status(500).json({ success: false, message: "Server error. Please try again later." });
+    }
+};
+
+export { userRegister, login, getProfile, editProfile, addSubmit, getSubmit }

@@ -144,9 +144,9 @@ const MyProfile = () => {
                 <button className='flex justify-center mt-10 bg-orange-500 text-white rounded-full py-2.5 max-w-36 ' onClick={() => { setIsEdit(false), editProfile() }}>Save Information</button>
                 : <button className='flex justify-center mt-10 bg-orange-500 text-white  rounded-full py-2.5 max-w-20 ' onClick={() => setIsEdit(true)}>Edit</button>}
 
-            <Link to='/general-inquery' className='mt-8 flex gap-3 items-center justify-center bg-orange-500 rounded-full  w-[70%] py-2 text-white  '>
-                <p className='text-lg'>Do you have any question ?</p>
-                <RiMessage2Line className='text-2xl'/>
+            <Link to='/help-and-support' className='mt-8 flex gap-3 items-center justify-center bg-orange-500 rounded-full  w-[50%] py-2 text-white  '>
+                <p className='text-lg'>Help & Support</p>
+                <RiMessage2Line className='text-2xl' />
             </Link>
         </div>
     )
