@@ -9,6 +9,8 @@ import MyProfile from './pages/MyProfile'
 import GeneralInquery from './pages/GeneralInquery'
 import SpecialInquery from './pages/SpecialInquery'
 import HelpAndSupport from './pages/HelpAndSupport'
+import Packages from './pages/Packages'
+import Cart from './pages/Cart'
 
 const App = () => {
   return (
@@ -22,6 +24,9 @@ const App = () => {
         <Route path='/help-and-support' element={<HelpAndSupport />} />
         <Route path='/general-inquery' element={<GeneralInquery />} />
         <Route path='/special-inquery' element={<SpecialInquery />} />
+        <Route path='/packages' element={<Packages />} />
+        <Route path='/packages/:type' element={<Packages />} />
+        <Route path='/cart' element={<Cart />} />
         <Route path='/detail-package/:id' element={<DetailPackage />} />
       </Routes>
     </div>

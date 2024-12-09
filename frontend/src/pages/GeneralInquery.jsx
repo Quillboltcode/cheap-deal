@@ -6,7 +6,9 @@ import { AppContext } from '../context/AppContext';
 
 const GeneralIquery = () => {
 
-    const { UrlBackend } = useContext(AppContext)
+    const { UrlBackend, profile } = useContext(AppContext)
+
+    const id = profile?._id
 
     const [questionType, setQuestionType] = useState("");
     const [questionText, setQuestionText] = useState("");
@@ -29,6 +31,7 @@ const GeneralIquery = () => {
         }
 
         const formData = new FormData();
+        formData.append("id", id);
         formData.append("type", questionType);
         formData.append("text", questionText);
         if (image) formData.append("image", image);

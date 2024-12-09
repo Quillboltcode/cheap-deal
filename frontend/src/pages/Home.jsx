@@ -63,10 +63,10 @@ const Home = () => {
                     {packages.slice(0, 5).map((item, index) => (
                         <div key={index} className='flex flex-col mt-5 border-2 border-gray-300 w-[430px] h-[430px] rounded-lg relative'>
                             <div className='mt-8 flex flex-col gap-2.5 items-center justify-center'>
-                                <p className='text-lg text-gray-800 font-medium'>{item.name} - 5GB Data/ Month</p>
+                                <p className='text-lg text-gray-800 font-medium'>{item.name}</p>
                                 <img src={item.image} className='w-36' alt="" />
                                 <Link to={`/detail-package/${item.id}`} onClick={() => scrollTo(0, 0)} className='text-center text-sm w-28 p-1 bg-red-500 rounded-xl text-white'>View Details</Link>
-                                <p>Price: <span className='text-gray-700 font-bold'>${item.new_price + 99} </span><span className='text-gray-500 line-through'>{item.old_price + 99}</span></p>
+                                <p>Price: <span className='text-gray-700 font-bold'>${item.type === 'device + data' ? item.new_price + 99 : item.new_price} </span><span className='text-gray-500 line-through'>{item.type === 'device + data' ? item.old_price + 99 : item.old_price}</span></p>
                                 <p className='text-sm px-5'>{item.des}</p>
                                 <div className='flex items-center gap-1.5'>
                                     <FaStar className='text-green-500' />
@@ -86,22 +86,22 @@ const Home = () => {
             <div className='flex flex-col'>
                 <p className='mt-10 text-2xl '>Packages Types</p>
                 <div className='flex items-center justify-between px-1.5 mt-5 w-[100%] h-24 rounded-lg border border-gray-400'>
-                    <div className='flex items-center flex-col'>
+                    <Link to={`/packages/mobile-only`} className='flex items-center flex-col'>
                         <CiMobile3 className='text-5xl text-gray-800' />
                         <p className='text-sm font-medium text-gray-700'>Mobile Only</p>
-                    </div>
-                    <div className='flex items-center flex-col'>
+                    </Link>
+                    <Link to={`/packages/tablet-only`} className='flex items-center flex-col'>
                         <IoIosTabletPortrait className='text-5xl text-gray-800' />
                         <p className='text-sm font-medium text-gray-700'>Tablet Only</p>
-                    </div>
-                    <div className='flex items-center flex-col'>
+                    </Link>
+                    <Link to={`/packages/broadband-only`} className='flex items-center flex-col'>
                         <HiDatabase className='text-5xl text-gray-800' />
                         <p className='text-sm font-medium text-gray-700'>Broadband Only</p>
-                    </div>
-                    <div className='flex items-center flex-col'>
+                    </Link>
+                    <Link to={`/packages/router-only`}  className='flex items-center flex-col'>
                         <CiRouter className='text-5xl text-gray-800' />
                         <p className='text-sm font-medium text-gray-700'>Router Only</p>
-                    </div> 
+                    </Link> 
                 </div>
             </div>
 
@@ -112,10 +112,10 @@ const Home = () => {
                         {packages.slice(5, 10).map((item, index) => (
                             <div key={index} className=' flex flex-col mt-5 border-2 border-gray-300 size-96 rounded-lg'>
                                 <div className='mt-3 flex flex-col gap-2.5 items-center justify-center'>
-                                    <p className='text-lg text-gray-800 font-medium'>{item.name} - 5GB Data/ Month</p>
+                                    <p className='text-lg text-gray-800 font-medium'>{item.name}</p>
                                     <img src={item.image} className='w-36' alt="" />
                                     <Link to={`/detail-package/${item.id}`} onClick={() => scrollTo(0, 0)} className='text-center text-sm w-28 p-1 bg-red-500 rounded-xl text-white'>View Details</Link>
-                                    <p>Price: <span className='text-gray-700 font-bold'>${item.new_price + 99} </span><span className='text-gray-500 line-through'>{item.old_price + 99}</span></p>
+                                    <p>Price: <span className='text-gray-700 font-bold'>${item.type === 'device + data' ? item.new_price + 99 : item.new_price} </span><span className='text-gray-500 line-through'>{item.type === 'device + data' ? item.old_price + 99 : item.old_price}</span></p>
                                     <p className='text-sm px-5'>{item.des}</p>
                                     <div className='flex items-center gap-1.5'>
                                         <FaStar className='text-green-500' />

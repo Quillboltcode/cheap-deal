@@ -141,7 +141,7 @@ const editProfile = async (req, res) => {
 // api add submit 
 const addSubmit = async (req, res) => {
     try {
-        const { type, text } = req.body;
+        const { type, text, id } = req.body;
         const image = req.file; // Assuming file is uploaded as `file` field
 
         // Validate required fields
@@ -158,7 +158,7 @@ const addSubmit = async (req, res) => {
         }
 
         // Create a new submission
-        const newSubmit = new submitModel({ type, text, image: imageUrl });
+        const newSubmit = new submitModel({ type, text, image: imageUrl, userId: id });
 
         // Save the submission to the database
         await newSubmit.save();
@@ -178,7 +178,7 @@ const getSubmit = async (req, res) => {
 
         // Check if an ID is provided
         if (id) {
-            submissions = await submitModel.findById(id);
+            submissions = await submitModel.find({ userId: id });
 
             if (!submissions) {
                 return res.status(404).json({ success: false, message: "Submission not found." });
