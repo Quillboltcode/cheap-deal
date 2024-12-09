@@ -61,9 +61,9 @@ const Home = () => {
                 <p className='mt-10 text-2xl '>Top Sale Packages</p>
                 <Slider {...settings}>
                     {packages.slice(0, 5).map((item, index) => (
-                        <div key={index} className='flex flex-col mt-5 border-2 border-gray-300 size-96 rounded-lg relative'>
-                            <div className='flex flex-col gap-2.5 items-center justify-center'>
-                                <p className='text-lg text-gray-800 font-medium'>{item.name} - 5GB Data</p>
+                        <div key={index} className='flex flex-col mt-5 border-2 border-gray-300 w-[430px] h-[430px] rounded-lg relative'>
+                            <div className='mt-8 flex flex-col gap-2.5 items-center justify-center'>
+                                <p className='text-lg text-gray-800 font-medium'>{item.name} - 5GB Data/ Month</p>
                                 <img src={item.image} className='w-36' alt="" />
                                 <Link to={`/detail-package/${item.id}`} onClick={() => scrollTo(0, 0)} className='text-center text-sm w-28 p-1 bg-red-500 rounded-xl text-white'>View Details</Link>
                                 <p>Price: <span className='text-gray-700 font-bold'>${item.new_price + 99} </span><span className='text-gray-500 line-through'>{item.old_price + 99}</span></p>
@@ -110,9 +110,9 @@ const Home = () => {
                     <p className='mt-8 text-2xl '>Recommended Packages</p>
                     <Slider {...settings}>
                         {packages.slice(5, 10).map((item, index) => (
-                            <div key={index} className='flex flex-col mt-5 border-2 border-gray-300 size-96 rounded-lg'>
-                                <div className='flex flex-col gap-2.5 items-center justify-center'>
-                                    <p className='text-lg text-gray-800 font-medium'>{item.name} - 5GB Data</p>
+                            <div key={index} className=' flex flex-col mt-5 border-2 border-gray-300 size-96 rounded-lg'>
+                                <div className='mt-3 flex flex-col gap-2.5 items-center justify-center'>
+                                    <p className='text-lg text-gray-800 font-medium'>{item.name} - 5GB Data/ Month</p>
                                     <img src={item.image} className='w-36' alt="" />
                                     <Link to={`/detail-package/${item.id}`} onClick={() => scrollTo(0, 0)} className='text-center text-sm w-28 p-1 bg-red-500 rounded-xl text-white'>View Details</Link>
                                     <p>Price: <span className='text-gray-700 font-bold'>${item.new_price + 99} </span><span className='text-gray-500 line-through'>{item.old_price + 99}</span></p>
