@@ -1,11 +1,11 @@
 import { createContext, useState } from "react";
-import { packages } from "../assets/assets";
+import { packagesAndDeal } from "../assets/assets";
 
 export const AppContext = createContext()
 
 const getCartDefault = () => {
     let cart = {}
-    for (let index = 0; index < packages.length + 1; index++) {
+    for (let index = 0; index < packagesAndDeal.length + 1; index++) {
         cart[index] = 0
     }
     return cart
@@ -17,6 +17,7 @@ const AppContextProvider = (props) => {
 
     const [profile, setProfile] = useState()
     const [packageId, setPackageId] = useState()
+    const [dealId, setDealId] = useState()
 
     const [indexData, setIndexData] = useState(1)
     const [priceData, setPriceData] = useState(99)
@@ -46,8 +47,8 @@ const AppContextProvider = (props) => {
         let totalAmount = 0;
         for (const item in cartItems) {
             if (cartItems[item] > 0) {
-                let itemInfo = packages.find((product) => product.id === Number(item) + 1)
-                totalAmount += itemInfo.new_price * cartItems[item];
+                let itemInfo = packagesAndDeal.find((product) => product.id === Number(item) + 1)
+                totalAmount += itemInfo?.new_price * cartItems[item];
             }
         }
         return totalAmount;
@@ -61,7 +62,8 @@ const AppContextProvider = (props) => {
         getTotalCartItems, getTotalCartAmount,
         indexData, setIndexData,
         priceData, setPriceData,
-        cartItems
+        cartItems,
+        dealId, setDealId
     }
     return (
         <AppContext.Provider value={value}>

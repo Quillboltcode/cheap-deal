@@ -6,7 +6,7 @@ import banner from '../assets/banner.jpg'
 import product_banner from '../assets/product_banner.jpg'
 import { toast } from 'react-toastify';
 import { AppContext } from '../context/AppContext';
-import { packages } from '../assets/assets';
+import { deals, packages } from '../assets/assets';
 import { FaStar } from "react-icons/fa";
 import { IoIosTabletPortrait } from "react-icons/io";
 import { CiMobile3 } from "react-icons/ci";
@@ -98,10 +98,10 @@ const Home = () => {
                         <HiDatabase className='text-5xl text-gray-800' />
                         <p className='text-sm font-medium text-gray-700'>Broadband Only</p>
                     </Link>
-                    <Link to={`/packages/router-only`}  className='flex items-center flex-col'>
+                    <Link to={`/packages/router-only`} className='flex items-center flex-col'>
                         <CiRouter className='text-5xl text-gray-800' />
                         <p className='text-sm font-medium text-gray-700'>Router Only</p>
-                    </Link> 
+                    </Link>
                 </div>
             </div>
 
@@ -135,12 +135,16 @@ const Home = () => {
             < div className='flex flex-col'>
                 <p className='mt-10 text-2xl '>Top Sale Deals</p>
                 <Slider {...settings}>
-                    {packages.slice(0, 5).map((item, index) => (
-                        <div key={index} className='flex flex-col mt-5 border-2 border-gray-300 size-96 rounded-lg relative'>
-                            <div className='flex flex-col gap-2.5 items-center justify-center'>
-                                <p className='text-lg text-gray-800 font-medium'>{item.name}</p>
-                                <img src={item.image} className='w-36' alt="" />
-                                <Link to={`/detail-package/${item.id}`} onClick={() => scrollTo(0, 0)} className='text-center text-sm w-28 p-1 bg-red-500 rounded-xl text-white'>View Details</Link>
+                    {deals.slice(0, 5).map((item, index) => (
+                        <div key={index} className='flex flex-col mt-5 border-2 border-gray-300 w-[430px] h-[430px] rounded-lg relative'>
+                            <div className='mt-8 flex flex-col gap-2.5 items-center justify-center'>
+                                <p className='text-lg px-2 text-gray-800 font-medium'>{item.name}</p>
+                                <div className='flex gap-2 items-center'>
+                                    <img src={item.image} className='w-32' alt="" />
+                                    <p className='text-5xl font-medium'>+</p>
+                                    <img src={item.image1} className='w-32' alt="" />
+                                </div>
+                                <Link to={`/detail-deal/${item.id}`} onClick={() => scrollTo(0, 0)} className='text-center text-sm w-28 p-1 bg-red-500 rounded-xl text-white'>View Details</Link>
                                 <p>Price: <span className='text-gray-700 font-bold'>${item.new_price} </span><span className='text-gray-500 line-through'>{item.old_price}</span></p>
                                 <p className='text-sm px-5'>{item.des}</p>
                                 <div className='flex items-center gap-1.5'>
@@ -162,12 +166,16 @@ const Home = () => {
                 <div className='flex flex-col'>
                     <p className='mt-8 text-2xl '>Recommended Packages</p>
                     <Slider {...settings}>
-                        {packages.slice(5, 10).map((item, index) => (
+                        {deals.slice(3, 8).map((item, index) => (
                             <div key={index} className='flex flex-col mt-5 border-2 border-gray-300 size-96 rounded-lg'>
                                 <div className='flex flex-col gap-2.5 items-center justify-center'>
                                     <p className='text-lg text-gray-800 font-medium'>{item.name}</p>
-                                    <img src={item.image} className='w-36' alt="" />
-                                    <Link to={`/detail-package/${item.id}`} onClick={() => scrollTo(0, 0)} className='text-center text-sm w-28 p-1 bg-red-500 rounded-xl text-white'>View Details</Link>
+                                    <div className='flex gap-2 items-center'>
+                                        <img src={item.image} className='w-32' alt="" />
+                                        <p className='text-5xl font-medium'>+</p>
+                                        <img src={item.image1} className='w-32' alt="" />
+                                    </div>
+                                    <Link to={`/detail-deal/${item.id}`} onClick={() => scrollTo(0, 0)} className='text-center text-sm w-28 p-1 bg-red-500 rounded-xl text-white'>View Details</Link>
                                     <p>Price: <span className='text-gray-700 font-bold'>${item.new_price} </span><span className='text-gray-500 line-through'>{item.old_price}</span></p>
                                     <p className='text-sm px-5'>{item.des}</p>
                                     <div className='flex items-center gap-1.5'>

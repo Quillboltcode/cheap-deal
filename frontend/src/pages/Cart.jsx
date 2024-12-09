@@ -1,14 +1,13 @@
 import React, { useContext } from 'react'
 import { toast } from 'react-toastify';
-import { packages } from '../assets/assets';
-import { TiDeleteOutline } from "react-icons/ti";
+import { packagesAndDeal } from '../assets/assets';
+import { FaMinus } from "react-icons/fa6";
 import { AppContext } from '../context/AppContext';
-import { MdDeleteOutline } from "react-icons/md";
+import { FaPlus } from "react-icons/fa";
 
 const Cart = () => {
 
-    const { cartItems, getTotalCartAmount, removeFromCart } = useContext(AppContext)
-    const notify = () => toast.success("Deleted Successfuly");
+    const { cartItems, getTotalCartAmount, removeFromCart, addToCart } = useContext(AppContext)
 
     console.log(cartItems)
 
@@ -16,12 +15,20 @@ const Cart = () => {
         <div className="mt-8 mx-3 mb-28">
             <p className="text-[35px] mb-7 font-bold">SHOPPING CART</p>
             <div>
-                {packages.map((item, index) => {
+                {packagesAndDeal.map((item, index) => {
                     if (cartItems?.[item.id] > 0) {
                         return (
                             <div key={index} className='flex flex-col gap-3'>
                                 <p className='text-gray-800 font-semibold'>Prodcuts:</p>
-                                <img src={item?.image} className='w-28' alt="" />
+                                <div className='flex gap-2 items-center'>
+                                    <img src={item?.image} className='w-32' alt="" />
+                                    {item?.image1 &&
+                                        <div className='flex items-center'>
+                                            <p className='text-5xl font-medium'>+</p>
+                                            <img src={item?.image1} className='w-32' alt="" />
+                                        </div>
+                                    }
+                                </div>
                                 <div className='flex gap-2'>
                                     <p className='text-gray-800 font-semibold'>Tittle: </p>
                                     <p>{item?.name}</p>
@@ -36,8 +43,12 @@ const Cart = () => {
                                 </div>
                                 <div className='flex gap-2 items-center'>
                                     <p className='text-gray-800 font-semibold'>Quantity:</p>
-                                    <p>{cartItems[item.id]}</p>
-                                    <MdDeleteOutline className='ml-20 text-xl' onClick={() => { removeFromCart(item.id), notify() }} />
+                                    <FaMinus className='ml-5 text-xl' onClick={() => { removeFromCart(item.id), toast.success("Deleted Successfully") }} />
+                                    <div className='mx-3 border border-gray-500 px-2 rounded-md'>
+                                        <p>{cartItems[item.id]}</p>
+                                    </div>
+                                    <FaPlus className='text-xl' onClick={() => { addToCart(item.id), toast.success("Added Successfully") }} />
+
                                 </div>
                                 <div className='flex gap-2'>
                                     <p className='text-gray-800 font-semibold'>Fees:</p>

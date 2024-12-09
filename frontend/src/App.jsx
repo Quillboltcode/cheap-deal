@@ -11,6 +11,9 @@ import SpecialInquery from './pages/SpecialInquery'
 import HelpAndSupport from './pages/HelpAndSupport'
 import Packages from './pages/Packages'
 import Cart from './pages/Cart'
+import Deals from './pages/Deals'
+import DetailDeal from './pages/DetailDeal'
+import SpecialInqueryDeal from './pages/SpecialInqueryDeal'
 
 const App = () => {
   return (
@@ -24,10 +27,13 @@ const App = () => {
         <Route path='/help-and-support' element={<HelpAndSupport />} />
         <Route path='/general-inquery' element={<GeneralInquery />} />
         <Route path='/special-inquery' element={<SpecialInquery />} />
+        <Route path='/special-inquery/deal' element={<SpecialInqueryDeal />} />
         <Route path='/packages' element={<Packages />} />
+        <Route path='/deals' element={<Deals />} />
         <Route path='/packages/:type' element={<Packages />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='/detail-package/:id' element={<DetailPackage />} />
+        <Route path='/detail-deal/:id' element={<DetailDeal />} />
       </Routes>
     </div>
   )

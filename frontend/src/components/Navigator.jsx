@@ -20,7 +20,7 @@ const navigator = () => {
                         className={`text-3xl text-gray-700 ${menu === 'packages' ? 'text-gray-950' : ''}`} />
                     <p className='text-sm'>Packages</p>
                 </Link>
-                <Link className='flex flex-col justify-center items-center'>
+                <Link to='/deals' className='flex flex-col justify-center items-center'>
                     <TfiPackage onClick={() => { scrollTo(0, 0), setMenu('deals') }}
                         className={`text-3xl text-gray-700 ${menu === 'deals' ? 'text-gray-950' : ''}`} />
                     <p className='text-sm'>Deals</p>
