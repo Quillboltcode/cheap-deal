@@ -37,6 +37,7 @@ export const packages = [
         image: phon11,
         new_price: 318,
         old_price: 358,
+        brand: "Iphon",
         type: 'device + data',
         des: "Features: Premium build, supports Apple Pencil Pro and Magic Keyboard."
     },
@@ -55,6 +56,7 @@ export const packages = [
         image: phon3,
         new_price: 849,
         old_price: 905,
+        brand: "Iphon",
         type: 'device + data',
         des: "Cameras: Triple rear system – 48MP (main), 12MP (ultrawide), 12MP (telephoto, 3x zoom).Battery: 4323mAh, up to 29W charging."
     },
@@ -64,6 +66,7 @@ export const packages = [
         image: phon4,
         new_price: 799,
         old_price: 859,
+        brand: "Iphon",
         type: 'device + data',
         des: "Cameras: Dual rear – 48MP (main), 12MP (ultrawide).Battery: 3300mAh with USB-C charging (new in 2023). "
     },
@@ -437,6 +440,7 @@ export const packagesAndDeal = [
         image: phon1,
         new_price: 318,
         old_price: 358,
+        brand: "Samsung",
         type: 'device + data',
         des: "Cameras: Triple rear camera setup with a primary sensor around 50MP.Battery:  Expected to feature a large 5000mAh battery with 15W charging."
     },
@@ -446,6 +450,7 @@ export const packagesAndDeal = [
         image: phon11,
         new_price: 318,
         old_price: 358,
+        brand: 'Iphon',
         type: 'device + data',
         des: "Features: Premium build, supports Apple Pencil Pro and Magic Keyboard."
     },
@@ -455,6 +460,7 @@ export const packagesAndDeal = [
         image: phon2,
         new_price: 1028,
         old_price: 1103,
+        brand: "Samsung",
         type: 'device + data',
         des: "Cameras: Triple rear setup – 50MP (main), 12MP (ultrawide), and 10MP (telephoto, 3x zoom).Battery: 3900mAh with 25W charging."
     },
@@ -464,6 +470,7 @@ export const packagesAndDeal = [
         image: phon3,
         new_price: 849,
         old_price: 905,
+        brand: 'Iphon',
         type: 'device + data',
         des: "Cameras: Triple rear system – 48MP (main), 12MP (ultrawide), 12MP (telephoto, 3x zoom).Battery: 4323mAh, up to 29W charging."
     },
@@ -473,6 +480,7 @@ export const packagesAndDeal = [
         image: phon4,
         new_price: 799,
         old_price: 859,
+        brand: 'Iphon',
         type: 'device + data',
         des: "Cameras: Dual rear – 48MP (main), 12MP (ultrawide).Battery: 3300mAh with USB-C charging (new in 2023). "
     },
@@ -500,6 +508,7 @@ export const packagesAndDeal = [
         image: phon12,
         new_price: 220,
         old_price: 273,
+        brand: "Samsung",
         type: 'device + data',
         des: "Features: Water-resistant, excellent multitasking."
     },
@@ -518,6 +527,7 @@ export const packagesAndDeal = [
         image: phon8,
         new_price: 499,
         old_price: 530,
+        brand: "Samsung",
         type: 'device + data',
         des: "Cameras: Triple rear setup – 48MP (main), ultrawide, and telephoto.Battery: 4821mAh, 30W charging."
     },
@@ -527,6 +537,7 @@ export const packagesAndDeal = [
         image: phon9,
         new_price: 999,
         old_price: 1050,
+        brand: "Samsung",
         type: 'device + data',
         des: "Cameras: Expected to include a 64MP main sensor.Battery: 4500mAh with 44W fast charging."
     },
@@ -536,6 +547,7 @@ export const packagesAndDeal = [
         image: phon10,
         new_price: 1799,
         old_price: 1859,
+        brand: "Samsung",
         type: 'device + data',
         des: "Cameras: 200MP (main), ultrawide, macro.Battery: 5100mAh, 67W charging."
     },
@@ -659,6 +671,7 @@ export const packagesAndDeal = [
         image: phon1,
         new_price: 318,
         old_price: 358,
+        brand: "Samsung",
         type: 'mobile-only',
         des: "Cameras: Triple rear camera setup with a primary sensor around 50MP.Battery:  Expected to feature a large 5000mAh battery with 15W charging."
     },
@@ -668,6 +681,7 @@ export const packagesAndDeal = [
         image: phon11,
         new_price: 318,
         old_price: 358,
+        brand: "Iphon",
         type: 'mobile-only',
         des: "Features: Premium build, supports Apple Pencil Pro and Magic Keyboard."
     },
@@ -677,6 +691,7 @@ export const packagesAndDeal = [
         image: phon2,
         new_price: 1028,
         old_price: 1103,
+        brand: "Samsung",
         type: 'mobile-only',
         des: "Cameras: Triple rear setup – 50MP (main), 12MP (ultrawide), and 10MP (telephoto, 3x zoom).Battery: 3900mAh with 25W charging."
     },
@@ -686,6 +701,7 @@ export const packagesAndDeal = [
         image: phon3,
         new_price: 849,
         old_price: 905,
+        brand: 'Iphon',
         type: 'mobile-only',
         des: "Cameras: Triple rear system – 48MP (main), 12MP (ultrawide), 12MP (telephoto, 3x zoom).Battery: 4323mAh, up to 29W charging."
     },
@@ -695,6 +711,7 @@ export const packagesAndDeal = [
         image: phon4,
         new_price: 799,
         old_price: 859,
+        brand: 'Iphon',
         type: 'mobile-only',
         des: "Cameras: Dual rear – 48MP (main), 12MP (ultrawide).Battery: 3300mAh with USB-C charging (new in 2023). "
     },
@@ -771,6 +788,7 @@ export const packagesAndDeal = [
         image1: phon2,
         new_price: 1890,
         old_price: 1999,
+        brand: "Samsung",
         type: 'broadband-only',
         des: "Iphone 15 Pink  +  Packages 500 minutes, 1000 SMS + 25BG/ Month"
     },
@@ -781,6 +799,7 @@ export const packagesAndDeal = [
         image1: phon1,
         new_price: 1890,
         old_price: 1999,
+        brand: "Samsung",
         type: 'broadband-only',
         des: "Iphone 15 Pink  +  Packages 500 minutes, 1000 SMS + 25BG/ Month"
     },

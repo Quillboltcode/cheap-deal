@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { MdOutlineUploadFile } from "react-icons/md";
 import { toast } from 'react-toastify';
 import { RiMessage2Line } from "react-icons/ri";
+import { MdOutlineRequestPage } from "react-icons/md";
 import axios from 'axios';
 import { AppContext } from '../context/AppContext';
 import { Link } from 'react-router-dom';
@@ -142,7 +143,13 @@ const MyProfile = () => {
 
             {isEdit ?
                 <button className='flex justify-center mt-10 bg-orange-500 text-white rounded-full py-2.5 max-w-36 ' onClick={() => { setIsEdit(false), editProfile() }}>Save Information</button>
-                : <button className='flex justify-center mt-10 bg-orange-500 text-white  rounded-full py-2.5 max-w-20 ' onClick={() => setIsEdit(true)}>Edit</button>}
+                : <button className='flex justify-center mt-10 bg-orange-500 text-white  rounded-full py-2.5 max-w-20 ' onClick={() => setIsEdit(true)}>Edit</button>
+            }
+
+            <Link to='/help-and-support' className='mt-8 flex gap-3 items-center justify-center bg-orange-500 rounded-full  w-[50%] py-2 text-white  '>
+                <p className='text-lg'>History</p>
+                <MdOutlineRequestPage className='text-2xl' />
+            </Link>
 
             <Link to='/help-and-support' className='mt-8 flex gap-3 items-center justify-center bg-orange-500 rounded-full  w-[50%] py-2 text-white  '>
                 <p className='text-lg'>Help & Support</p>

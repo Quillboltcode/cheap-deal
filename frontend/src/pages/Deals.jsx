@@ -71,12 +71,6 @@ const Deals = () => {
 
                                 {/* Package Description */}
                                 <p className="text-sm px-5">{item.des}</p>
-
-                                {/* Customize Option */}
-                                <div className="flex items-center gap-1.5">
-                                    <FaStar className="text-green-500" />
-                                    <p className="text-gray-800">Customize Your Own Package</p>
-                                </div>
                             </div>
                         </div>
                     ))

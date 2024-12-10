@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-key */
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { AiOutlineMenu } from "react-icons/ai";
 import { CiSearch } from "react-icons/ci";
 import banner from '../assets/banner.jpg'
@@ -13,6 +13,8 @@ import { CiMobile3 } from "react-icons/ci";
 import { HiDatabase } from "react-icons/hi";
 import { AiOutlineFire } from "react-icons/ai";
 import { CiRouter } from "react-icons/ci";
+import { FaFilter } from "react-icons/fa";
+import { FaFire } from "react-icons/fa";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -22,6 +24,9 @@ import logo from '../assets/logo.png'
 const Home = () => {
 
     const { profile } = useContext(AppContext)
+
+    const [fillter, setFillter] = useState(false)
+    const [search, setSearch] = useState(false)
 
     const settings = {
         dots: true,
@@ -48,7 +53,27 @@ const Home = () => {
                     className='px-3.5 mt-3 w-[100%] h-12 bg-gray-300 rounded-2xl '
                     placeholder='Search'
                 />
-                <CiSearch className='absolute top-6 right-10 text-xl' />
+                <CiSearch onClick={() => setSearch(!search)} className=' absolute top-6 right-10 text-2xl' />
+                <div className={`absolute z-50 -bottom-[300px] rounded-lg bg-gray-200 w-[100%] p-5 pb-32 ${search ? "flex flex-col" : 'hidden'}`}>
+                    <div className='flex gap-2 items-center border border-red-300 w-fit px-2 rounded-lg py-2'>
+                        <p>Iphone 15 Pro Max</p>
+                        <FaFire className='text-red-500' />
+                    </div>
+                    <div className='mt-2 flex gap-2 items-center border border-red-300 w-fit px-2 rounded-lg py-2'>
+                        <p>Samsung Galaxy Tab S9 Ultra</p>
+                        <FaFire className='text-red-500' />
+                    </div>
+                    <div className='flex gap-3.5'>
+                        <div className='mt-2 flex gap-2 items-center border border-red-300 w-fit px-2 rounded-lg py-2'>
+                            <p>Galaxy A16</p>
+                            <FaFire className='text-red-500' />
+                        </div>
+                        <div className='mt-2 flex gap-2 items-center border border-red-300 w-fit px-2 rounded-lg py-2'>
+                            <p>5BG/ Month</p>
+                            <FaFire className='text-red-500' />
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div className='relative'>
@@ -57,8 +82,58 @@ const Home = () => {
                 <p className='text-white text-xl font-semibold absolute top-20 left-5 font-mono'>Sale 15% <br /> All Packages <br /> or Deal </p>
             </div>
 
-            < div className='flex flex-col'>
-                <p className='mt-10 text-2xl '>Top Sale Packages</p>
+            <div className='flex flex-col relative'>
+                <div className='mt-10 flex justify-between items-center '>
+                    <p className=' text-2xl '>Top Sale Packages</p>
+                    <div className='flex flex-col items-center gap-1'>
+                        <FaFilter className='text-2xl text-gray-700' onClick={() => setFillter(!fillter)} />
+                        <p>Fillter</p>
+                    </div>
+
+                    <div className={`absolute bg-gray-200 w-[100%] z-50 rounded-lg right-0 top-24 p-6  font-medium ${fillter ? "flex" : 'hidden'}`} >
+                        <form className="flex flex-col gap-5 w-1/3">
+                            <div className="flex gap-2">
+                                <input type="radio" id="samsung" name="brand" />
+                                <label htmlFor="samsung">Samsung</label>
+                            </div>
+                            <div className="flex gap-2">
+                                <input type="radio" id="iphone" name="brand" />
+                                <label htmlFor="iphone">iPhone</label>
+                            </div>
+                            <div className="flex gap-2">
+                                <input type="radio" id="vivo" name="brand" />
+                                <label htmlFor="vivo">Vivo</label>
+                            </div>
+                            <div className="flex gap-2">
+                                <input type="radio" id="asus" name="brand" />
+                                <label htmlFor="asus">ASUS</label>
+                            </div>
+                            <div className="flex gap-2">
+                                <input type="radio" id="other" name="brand" />
+                                <label htmlFor="other">Other</label>
+                            </div>
+                        </form>
+
+
+                        <div className='w-2/3'>
+                            <p>Price: </p>
+                            <div className='flex flex-col gap-2'>
+                                <div className='flex justify-between'>
+                                    <p>$50</p>
+                                    <p>$1500</p>
+                                </div>
+                                <div className='h-1 w-56 bg-gray-300 rounded-md'>
+                                    <div className='bg-red-500 w-20 h-1 rounded-md'></div>
+                                </div>
+                            </div>
+                            <div className='flex justify-center py-1.5 w-[50%] rounded-xl items-center gap-2 mt-16 border border-gray-400'>
+                                <p>Fillter</p>
+                                <FaFilter className='text-gray-700' />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <Slider {...settings}>
                     {packages.slice(0, 5).map((item, index) => (
                         <div key={index} className='flex flex-col mt-5 border-2 border-gray-300 w-[430px] h-[430px] rounded-lg relative'>
