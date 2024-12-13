@@ -25,7 +25,6 @@ const Home = () => {
 
     const { profile } = useContext(AppContext)
 
-    const [fillter, setFillter] = useState(false)
     const [search, setSearch] = useState(false)
 
     const settings = {
@@ -85,53 +84,6 @@ const Home = () => {
             <div className='flex flex-col relative'>
                 <div className='mt-10 flex justify-between items-center '>
                     <p className=' text-2xl '>Top Sale Packages</p>
-                    <div className='flex flex-col items-center gap-1'>
-                        <FaFilter className='text-2xl text-gray-700' onClick={() => setFillter(!fillter)} />
-                        <p>Fillter</p>
-                    </div>
-
-                    <div className={`absolute bg-gray-200 w-[100%] z-50 rounded-lg right-0 top-24 p-6  font-medium ${fillter ? "flex" : 'hidden'}`} >
-                        <form className="flex flex-col gap-5 w-1/3">
-                            <div className="flex gap-2">
-                                <input type="radio" id="samsung" name="brand" />
-                                <label htmlFor="samsung">Samsung</label>
-                            </div>
-                            <div className="flex gap-2">
-                                <input type="radio" id="iphone" name="brand" />
-                                <label htmlFor="iphone">iPhone</label>
-                            </div>
-                            <div className="flex gap-2">
-                                <input type="radio" id="vivo" name="brand" />
-                                <label htmlFor="vivo">Vivo</label>
-                            </div>
-                            <div className="flex gap-2">
-                                <input type="radio" id="asus" name="brand" />
-                                <label htmlFor="asus">ASUS</label>
-                            </div>
-                            <div className="flex gap-2">
-                                <input type="radio" id="other" name="brand" />
-                                <label htmlFor="other">Other</label>
-                            </div>
-                        </form>
-
-
-                        <div className='w-2/3'>
-                            <p>Price: </p>
-                            <div className='flex flex-col gap-2'>
-                                <div className='flex justify-between'>
-                                    <p>$50</p>
-                                    <p>$1500</p>
-                                </div>
-                                <div className='h-1 w-56 bg-gray-300 rounded-md'>
-                                    <div className='bg-red-500 w-20 h-1 rounded-md'></div>
-                                </div>
-                            </div>
-                            <div className='flex justify-center py-1.5 w-[50%] rounded-xl items-center gap-2 mt-16 border border-gray-400'>
-                                <p>Fillter</p>
-                                <FaFilter className='text-gray-700' />
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <Slider {...settings}>

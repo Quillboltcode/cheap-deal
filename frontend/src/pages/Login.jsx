@@ -63,12 +63,13 @@ const login = () => {
                         className='w-[100%] border border-gray-300 mt-2 rounded-md h-14 pl-8 pr-12'
                         value={password} onChange={(e) => setPassword(e.target.value)}
                     />
-                    <RiLockPasswordLine className='absolute text-lg bottom-4 left-1.5' />
+                    <RiLockPasswordLine className='absolute text-lg bottom-14 left-1.5' />
                     {
                         isShow ?
-                            <FaRegEye className='absolute text-2xl bottom-3 right-12' onClick={() => setIsShow(false)} />
-                            : <FaRegEyeSlash className='absolute text-2xl bottom-3 right-12' onClick={() => setIsShow(true)} />
+                            <FaRegEye className='absolute text-2xl bottom-14 right-10' onClick={() => setIsShow(false)} />
+                            : <FaRegEyeSlash className='absolute text-2xl bottom-14 right-10' onClick={() => setIsShow(true)} />
                     }
+                    <p className='text-base mt-3 text-blue-400 underline'>Forgot Password?</p>
                 </div>
 
                 <div className='flex justify-center'>

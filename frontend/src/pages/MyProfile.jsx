@@ -155,6 +155,11 @@ const MyProfile = () => {
                 <p className='text-lg'>Help & Support</p>
                 <RiMessage2Line className='text-2xl' />
             </Link>
+
+            <Link to='/login' className='mt-8 flex gap-3 items-center justify-center bg-red-500 rounded-full  w-[50%] py-2 text-white  '>
+                <p className='text-lg'>Logout</p>
+                <RiMessage2Line className='text-2xl' />
+            </Link>
         </div>
     )
 }
